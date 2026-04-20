@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Equity Work Flow — The Investor Onboarding Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:opsz,wght@9..40,200;9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ──────────────────────────────────────────────── */
+:root {
+  --navy:   #0d1e3d;
+  --navy2:  #162d55;
+  --navy3:  #1e3d70;
+  --gold:   #c9a84c;
+  --gold2:  #e2c478;
+  --gold-d: #8a6710;
+  --gold-pale: #faf3df;
+  --parch:  #f5f3ef;
+  --parch2: #edeae3;
+  --parch3: #e2ddd5;
+  --cream:  #faf9f7;
+  --ink:    #1a1916;
+  --ink2:   #3d3b35;
+  --ink3:   #6e6b62;
+  --ink4:   #9e9a91;
+  --ink5:   #c8c4bb;
+  --green:  #1a5c2e;
+  --green-pale: #eaf4ed;
+  --teal:   #0c5c52;
+  --teal-pale: #e5f4f1;
+  --border: rgba(26,25,22,.09);
+  --border2:rgba(26,25,22,.15);
+  --r:6px; --r2:10px; --r3:14px; --r4:20px;
+  --sh:  0 1px 3px rgba(26,25,22,.06),0 4px 16px rgba(26,25,22,.04);
+  --sh2: 0 4px 24px rgba(26,25,22,.10),0 16px 48px rgba(26,25,22,.06);
+  --sh3: 0 8px 32px rgba(26,25,22,.14),0 24px 64px rgba(26,25,22,.08);
+}
+
+/* ─── RESET & BASE ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { font-family:'DM Sans',sans-serif; background:var(--parch); color:var(--ink); font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased; }
+
+/* ─── TYPOGRAPHY ──────────────────────────────────────────── */
+.serif { font-family:'Playfair Display',serif; }
+.mono  { font-family:'DM Mono',monospace; }
+
+/* ─── NAV ─────────────────────────────────────────────────── */
+.nav {
+  position: fixed; top:0; left:0; right:0; z-index:200;
+  height: 68px;
+  display: flex; align-items:center; justify-content:space-between;
+  padding: 0 48px;
+  transition: all .3s;
+}
+.nav.scrolled {
+  background: rgba(13,30,61,.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.nav-brand { display:flex; align-items:center; gap:11px; text-decoration:none; }
+.nav-equity { font-family:'Playfair Display',serif; font-size:19px; font-weight:500; color:#fff; letter-spacing:.08em; line-height:1; }
+.nav-wf { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-top:3px; }
+.nav-links { display:flex; align-items:center; gap:6px; }
+.nav-link { color:rgba(255,255,255,.55); font-size:13.5px; text-decoration:none; padding:6px 14px; border-radius:var(--r); transition:color .15s; }
+.nav-link:hover { color:rgba(255,255,255,.9); }
+.nav-cta {
+  background: rgba(201,168,76,.15);
+  border: 1px solid rgba(201,168,76,.4);
+  color: var(--gold);
+  font-size:13px; font-weight:500;
+  padding: 8px 20px;
+  border-radius: var(--r);
+  text-decoration:none; cursor:pointer;
+  transition: all .15s;
+}
+.nav-cta:hover { background:rgba(201,168,76,.25); border-color:var(--gold); color:var(--gold2); }
+
+/* ─── HERO ─────────────────────────────────────────────────── */
+.hero {
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex; flex-direction:column;
+  position: relative; overflow:hidden;
+}
+.hero-grid {
+  position: absolute; inset:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+.hero-glow {
+  position: absolute; inset:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 70% 60% at 65% 35%, rgba(201,168,76,.08) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 15% 80%, rgba(12,92,82,.12) 0%, transparent 55%);
+}
+.hero-body {
+  flex:1; display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:60px;
+  align-items: center;
+  max-width: 1160px; margin:0 auto; width:100%;
+  padding: 140px 48px 80px;
+  position:relative; z-index:2;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items:center; gap:10px;
+  font-size:11px; font-weight:500; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:24px;
+}
+.hero-eyebrow::before { content:''; width:28px; height:1px; background:var(--gold); }
+.hero-headline {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(40px,5vw,64px);
+  font-weight:400; line-height:1.08;
+  color:#fff; letter-spacing:-.01em;
+  margin-bottom:22px;
+}
+.hero-headline em { font-style:italic; color:var(--gold); }
+.hero-desc {
+  font-size:16px; font-weight:300; color:rgba(255,255,255,.48);
+  line-height:1.75; max-width:480px; margin-bottom:40px;
+}
+.hero-actions { display:flex; align-items:center; gap:20px; }
+.btn-primary {
+  background:var(--gold); color:var(--navy);
+  font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:600;
+  padding:13px 32px; border-radius:var(--r);
+  border:none; cursor:pointer; text-decoration:none;
+  transition: all .15s; display:inline-flex; align-items:center; gap:7px;
+}
+.btn-primary:hover { background:var(--gold2); }
+.btn-ghost-light {
+  color:rgba(255,255,255,.55); font-size:13.5px; font-weight:400;
+  text-decoration:none; display:inline-flex; align-items:center; gap:7px;
+  transition:color .15s;
+}
+.btn-ghost-light:hover { color:rgba(255,255,255,.9); }
+.hero-trust {
+  display: flex; align-items:center; gap:20px;
+  padding-top:32px; margin-top:32px;
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.trust-item { font-size:12px; font-weight:300; color:rgba(255,255,255,.35); display:flex; align-items:center; gap:7px; }
+.trust-dot { width:4px; height:4px; border-radius:50%; background:var(--gold); opacity:.6; }
+
+/* Hero right — dashboard mockup */
+.hero-mockup { position:relative; }
+.mockup-frame {
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--r3);
+  overflow:hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+}
+.mockup-bar {
+  height:38px; background:rgba(13,30,61,.8);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex; align-items:center; padding:0 14px; gap:7px;
+}
+.mock-dot { width:9px; height:9px; border-radius:50%; }
+.mockup-sidebar {
+  width:48px; background:rgba(13,30,61,.9);
+  border-right:1px solid rgba(255,255,255,.05);
+  display:flex; flex-direction:column; align-items:center;
+  padding:12px 0; gap:18px;
+}
+.mock-icon {
+  width:24px; height:24px; border-radius:4px;
+  background:rgba(255,255,255,.07);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px;
+}
+.mock-icon.active { background:rgba(201,168,76,.2); }
+.mockup-inner { display:flex; height:260px; }
+.mockup-main { flex:1; padding:16px; background:rgba(245,243,239,.04); }
+.mock-stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+.mock-stat {
+  background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.06);
+  border-radius:6px; padding:10px 12px;
+}
+.mock-stat-l { font-size:8px; text-transform:uppercase; letter-spacing:.7px; color:rgba(255,255,255,.3); margin-bottom:4px; }
+.mock-stat-v { font-family:'Playfair Display',serif; font-size:18px; color:#fff; }
+.mock-stat-d { font-size:9px; color:var(--gold); margin-top:2px; }
+.mock-table { background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.05); border-radius:6px; overflow:hidden; }
+.mock-th { display:grid; grid-template-columns:2fr 1.5fr 1fr 1fr; padding:7px 12px; border-bottom:1px solid rgba(255,255,255,.05); }
+.mock-th span { font-size:8px; text-transform:uppercase; letter-spacing:.6px; color:rgba(255,255,255,.25); }
+.mock-tr { display:grid; grid-template-columns:2fr 1.5fr 1fr 1fr; padding:8px 12px; border-bottom:1px solid rgba(255,255,255,.04); align-items:center; }
+.mock-tr:last-child { border-bottom:none; }
+.mock-tr-n { font-size:10px; font-weight:500; color:rgba(255,255,255,.75); }
+.mock-tr-s { font-size:9px; color:rgba(255,255,255,.35); margin-top:1px; }
+.mock-badge { display:inline-flex; padding:2px 7px; border-radius:10px; font-size:8px; font-weight:600; }
+.mock-b-green { background:rgba(26,92,46,.4); color:#6fcf97; }
+.mock-b-gold  { background:rgba(201,168,76,.2); color:var(--gold); }
+.mock-b-teal  { background:rgba(12,92,82,.35); color:#5bb8b0; }
+.mock-b-navy  { background:rgba(30,61,112,.5); color:#7fa5e0; }
+.mock-amt { font-family:'DM Mono',monospace; font-size:9px; color:rgba(255,255,255,.6); }
+/* Floating notification card */
+.mock-notif {
+  position:absolute; bottom:-16px; right:-20px;
+  background:var(--cream); border:1px solid var(--border);
+  border-radius:var(--r2); padding:12px 16px;
+  box-shadow:var(--sh3); min-width:220px;
+  animation: floatUp 3s ease-in-out infinite;
+}
+@keyframes floatUp { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.mock-notif-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--green); margin-bottom:4px; }
+.mock-notif-text { font-size:12px; font-weight:600; color:var(--ink); }
+.mock-notif-sub  { font-size:11px; color:var(--ink3); margin-top:2px; }
+
+/* ─── HERO STATS STRIP ─────────────────────────────────────── */
+.hero-stats {
+  background:rgba(255,255,255,.03);
+  border-top:1px solid rgba(255,255,255,.06);
+  display:grid; grid-template-columns:repeat(4,1fr);
+  position:relative; z-index:2;
+}
+.hero-stat { padding:28px 0; text-align:center; border-right:1px solid rgba(255,255,255,.06); }
+.hero-stat:last-child { border-right:none; }
+.hs-val {
+  font-family:'Playfair Display',serif; font-size:36px; font-weight:400;
+  color:#fff; line-height:1; margin-bottom:6px;
+}
+.hs-val span { color:var(--gold); font-size:26px; }
+.hs-label { font-size:11px; font-weight:300; color:rgba(255,255,255,.38); letter-spacing:.06em; text-transform:uppercase; }
+
+/* ─── SECTION WRAPPER ─────────────────────────────────────── */
+.section { max-width:1160px; margin:0 auto; padding:100px 48px; }
+.section-sm { max-width:1160px; margin:0 auto; padding:72px 48px; }
+.section-eyebrow {
+  font-size:10px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--gold-d); margin-bottom:10px;
+  display:flex; align-items:center; gap:10px;
+}
+.section-eyebrow::before { content:''; width:24px; height:1px; background:var(--gold-d); }
+.section-heading {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(32px,4vw,48px); font-weight:400;
+  color:var(--ink); line-height:1.15; letter-spacing:-.01em;
+}
+.section-heading em { font-style:italic; color:var(--gold-d); }
+.section-sub { font-size:15.5px; font-weight:300; color:var(--ink3); line-height:1.75; max-width:560px; margin-top:14px; }
+
+/* ─── HOW IT WORKS ─────────────────────────────────────────── */
+.hiw-bg { background:var(--cream); }
+.hiw-steps {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:0; margin-top:56px; position:relative;
+  border:1px solid var(--border); border-radius:var(--r3);
+  overflow:hidden; box-shadow:var(--sh);
+}
+/* connecting line */
+.hiw-steps::before {
+  content:''; position:absolute;
+  top:44px; left:calc(25% + 20px); right:calc(25% + 20px);
+  height:1px; background:linear-gradient(90deg, var(--gold-d) 0%, var(--gold) 100%);
+  opacity:.3; pointer-events:none; z-index:1;
+}
+.hiw-step {
+  padding:36px 28px 32px; background:var(--cream);
+  border-right:1px solid var(--border);
+  position:relative;
+}
+.hiw-step:last-child { border-right:none; }
+.hiw-num {
+  width:40px; height:40px; border-radius:50%;
+  background:var(--navy); color:var(--gold);
+  font-family:'Playfair Display',serif; font-size:16px; font-weight:500;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:18px; position:relative; z-index:2;
+}
+.hiw-title { font-family:'Playfair Display',serif; font-size:17px; font-weight:500; color:var(--ink); margin-bottom:8px; }
+.hiw-desc { font-size:13.5px; font-weight:300; color:var(--ink3); line-height:1.7; }
+
+/* ─── FEATURES GRID ────────────────────────────────────────── */
+.features-bg { background:var(--navy); }
+.features-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:rgba(255,255,255,.05);
+  margin-top:56px; border-radius:var(--r3); overflow:hidden;
+}
+.feature-card {
+  background:var(--navy); padding:40px 36px;
+  transition:background .2s;
+}
+.feature-card:hover { background:var(--navy2); }
+.feat-icon {
+  width:48px; height:48px; border-radius:var(--r2);
+  background:rgba(201,168,76,.12); border:1px solid rgba(201,168,76,.2);
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:20px;
+}
+.feat-num { font-family:'Playfair Display',serif; font-size:52px; font-weight:300; color:rgba(255,255,255,.05); line-height:1; margin-bottom:12px; }
+.feat-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:500; color:#fff; margin-bottom:10px; }
+.feat-desc { font-size:13.5px; font-weight:300; color:rgba(255,255,255,.42); line-height:1.75; }
+.feat-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--gold); margin-top:18px; text-decoration:none; }
+
+/* ─── WORKFLOW SECTION ─────────────────────────────────────── */
+.workflow-layout {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:80px; align-items:center;
+}
+.workflow-steps { display:flex; flex-direction:column; gap:0; }
+.wf-step {
+  display:flex; gap:20px; padding:20px 0;
+  border-bottom:1px solid var(--border);
+  cursor:pointer; transition:all .15s;
+}
+.wf-step:last-child { border-bottom:none; }
+.wf-step.active { padding-left:12px; border-left:2px solid var(--gold-d); }
+.wf-dot {
+  width:32px; height:32px; border-radius:50%; flex-shrink:0;
+  background:var(--parch2); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:var(--ink4); margin-top:2px;
+  transition:all .15s;
+}
+.wf-step.active .wf-dot { background:var(--navy); color:var(--gold); border-color:var(--navy); }
+.wf-content-title { font-size:14.5px; font-weight:600; color:var(--ink); margin-bottom:4px; }
+.wf-content-desc { font-size:13px; font-weight:300; color:var(--ink3); line-height:1.65; }
+.wf-step.active .wf-content-title { color:var(--navy); }
+/* Right panel */
+.wf-panel {
+  background:var(--cream); border:1px solid var(--border);
+  border-radius:var(--r3); overflow:hidden;
+  box-shadow:var(--sh2); min-height:420px;
+}
+.wf-panel-hd {
+  padding:18px 22px; border-bottom:1px solid var(--border);
+  background:var(--navy);
+  display:flex; align-items:center; justify-content:space-between;
+}
+.wf-panel-title { font-family:'Playfair Display',serif; font-size:15px; font-weight:500; color:#fff; }
+.wf-panel-badge { font-size:10px; padding:3px 10px; border-radius:10px; font-weight:600; }
+.wf-panel-body { padding:20px; }
+
+/* ─── COMPETITOR SECTION ────────────────────────────────────── */
+.comp-bg { background:var(--parch2); }
+.comp-table-wrap {
+  margin-top:48px; border:1px solid var(--border);
+  border-radius:var(--r3); overflow:hidden; box-shadow:var(--sh);
+}
+.comp-table { width:100%; border-collapse:collapse; }
+.comp-table th {
+  padding:13px 22px; font-size:10.5px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.7px;
+  color:var(--ink4); background:var(--parch3);
+  border-bottom:1px solid var(--border); text-align:left;
+}
+.comp-table th.hero-col { background:var(--navy); color:var(--gold); text-align:center; }
+.comp-table td {
+  padding:13px 22px; border-bottom:1px solid var(--border);
+  font-size:13.5px; color:var(--ink2); vertical-align:middle;
+}
+.comp-table td.hero-col {
+  background:rgba(13,30,61,.03); text-align:center;
+  font-weight:600; color:var(--ink);
+  border-left:2px solid rgba(13,30,61,.1);
+  border-right:2px solid rgba(13,30,61,.1);
+}
+.comp-table tr:last-child td { border-bottom:none; }
+.comp-table tbody tr:hover td { background:var(--parch3); }
+.comp-table tbody tr:hover td.hero-col { background:rgba(13,30,61,.05); }
+.ck { color:var(--green); font-size:15px; }
+.cx { color:var(--ink5); }
+.cp { color:var(--gold-d); }
+
+/* ─── TESTIMONIALS ─────────────────────────────────────────── */
+.testimonials-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-top:48px; }
+.tcard {
+  background:var(--cream); border:1px solid var(--border);
+  border-radius:var(--r3); padding:28px 28px 24px;
+  box-shadow:var(--sh); position:relative;
+}
+.tcard::before {
+  content:'"'; font-family:'Playfair Display',serif;
+  font-size:80px; color:var(--gold); opacity:.15;
+  position:absolute; top:10px; left:20px; line-height:1;
+}
+.tcard-text { font-size:14px; font-weight:300; color:var(--ink2); line-height:1.75; margin-bottom:20px; position:relative; z-index:1; }
+.tcard-author { display:flex; align-items:center; gap:10px; }
+.tcard-avi {
+  width:34px; height:34px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:700; color:#fff; flex-shrink:0;
+}
+.tcard-name { font-size:13px; font-weight:600; color:var(--ink); }
+.tcard-role { font-size:11.5px; color:var(--ink4); }
+
+/* ─── LOGIN / BETA SECTION ─────────────────────────────────── */
+.login-section { background:var(--navy); position:relative; overflow:hidden; }
+.login-section::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 60% 70% at 50% 50%, rgba(201,168,76,.06) 0%, transparent 65%);
+}
+.login-section::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+  background-size:56px 56px;
+}
+.login-inner {
+  position:relative; z-index:2;
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:80px; align-items:center;
+}
+.login-headline { font-family:'Playfair Display',serif; font-size:clamp(28px,3.5vw,44px); font-weight:400; color:#fff; line-height:1.2; margin-bottom:14px; }
+.login-headline em { font-style:italic; color:var(--gold); }
+.login-desc { font-size:15px; font-weight:300; color:rgba(255,255,255,.45); line-height:1.75; margin-bottom:28px; }
+.login-bullets { display:flex; flex-direction:column; gap:10px; }
+.login-bullet { display:flex; align-items:center; gap:10px; font-size:13.5px; font-weight:300; color:rgba(255,255,255,.55); }
+.login-bullet::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--gold); flex-shrink:0; }
+
+/* Login card */
+.login-card {
+  background:var(--cream);
+  border-radius:var(--r3);
+  overflow:hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.35), 0 4px 12px rgba(0,0,0,.2);
+}
+.lc-header {
+  background:var(--navy2); padding:24px 28px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.lc-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:500; color:#fff; }
+.lc-sub { font-size:12.5px; color:rgba(255,255,255,.38); margin-top:3px; }
+.lc-beta-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.3);
+  color:var(--gold); font-size:10px; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; padding:4px 10px; border-radius:20px; margin-bottom:16px;
+}
+.lc-body { padding:28px; }
+.lc-tabs { display:flex; background:var(--parch2); border:1px solid var(--border); border-radius:var(--r2); padding:3px; margin-bottom:22px; }
+.lc-tab { flex:1; padding:7px; text-align:center; border-radius:var(--r); font-size:13px; font-weight:500; cursor:pointer; transition:all .15s; color:var(--ink3); border:none; background:transparent; }
+.lc-tab.active { background:var(--cream); color:var(--ink); box-shadow:var(--sh); }
+.lf-group { margin-bottom:14px; }
+.lf-label { font-size:11.5px; font-weight:500; color:var(--ink2); margin-bottom:5px; display:block; }
+.lf-input {
+  width:100%; padding:9px 13px; border:1px solid var(--border2);
+  border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:14px;
+  color:var(--ink); background:var(--cream); outline:none;
+  transition:border-color .13s, box-shadow .13s;
+}
+.lf-input:focus { border-color:var(--navy); box-shadow:0 0 0 3px rgba(13,30,61,.08); }
+.lf-select { width:100%; padding:9px 13px; border:1px solid var(--border2); border-radius:var(--r); font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink); background:var(--cream); outline:none; cursor:pointer; }
+.lf-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.lf-btn {
+  width:100%; padding:12px; background:var(--navy); color:#fff;
+  border:none; border-radius:var(--r); font-family:'DM Sans',sans-serif;
+  font-size:14px; font-weight:600; cursor:pointer; transition:background .15s;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.lf-btn:hover { background:var(--navy2); }
+.lf-btn.gold { background:var(--gold-d); }
+.lf-btn.gold:hover { background:var(--gold); color:var(--navy); }
+.lf-hint { font-size:11.5px; color:var(--ink4); text-align:center; margin-top:12px; line-height:1.5; }
+.lf-divider { display:flex; align-items:center; gap:12px; margin:16px 0; }
+.lf-divider::before,.lf-divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.lf-divider span { font-size:12px; color:var(--ink4); }
+/* Success state */
+.lf-success { display:none; text-align:center; padding:20px 0; }
+.lf-success.show { display:block; }
+.lf-success-icon { width:56px; height:56px; border-radius:50%; background:var(--green-pale); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:22px; }
+.lf-success-title { font-family:'Playfair Display',serif; font-size:20px; font-weight:500; margin-bottom:6px; color:var(--ink); }
+.lf-success-text { font-size:13.5px; color:var(--ink3); line-height:1.65; }
+
+/* ─── FOOTER ────────────────────────────────────────────────── */
+.footer { background:var(--ink); padding:60px 48px 40px; }
+.footer-inner { max-width:1160px; margin:0 auto; }
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:60px; margin-bottom:48px; }
+.footer-brand-equity { font-family:'Playfair Display',serif; font-size:22px; font-weight:500; color:#fff; letter-spacing:.06em; }
+.footer-brand-wf { font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-top:4px; }
+.footer-tagline { font-size:13px; font-weight:300; color:rgba(255,255,255,.35); margin-top:12px; line-height:1.6; max-width:220px; }
+.footer-domain { font-family:'DM Mono',monospace; font-size:11px; color:rgba(255,255,255,.2); margin-top:10px; }
+.footer-col-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:rgba(255,255,255,.25); margin-bottom:14px; }
+.footer-link { display:block; font-size:13.5px; font-weight:300; color:rgba(255,255,255,.45); text-decoration:none; margin-bottom:8px; transition:color .15s; }
+.footer-link:hover { color:rgba(255,255,255,.8); }
+.footer-bottom { border-top:1px solid rgba(255,255,255,.07); padding-top:24px; display:flex; justify-content:space-between; align-items:center; }
+.footer-copy { font-size:12px; color:rgba(255,255,255,.22); }
+.footer-legal { display:flex; gap:20px; }
+.footer-legal a { font-size:12px; color:rgba(255,255,255,.25); text-decoration:none; }
+
+/* ─── ANIMATIONS ────────────────────────────────────────────── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.hero-eyebrow  { animation:fadeUp .6s ease .1s both; }
+.hero-headline { animation:fadeUp .7s ease .25s both; }
+.hero-desc     { animation:fadeUp .7s ease .38s both; }
+.hero-actions  { animation:fadeUp .7s ease .5s both; }
+.hero-trust    { animation:fadeUp .7s ease .62s both; }
+.hero-mockup   { animation:fadeUp .9s ease .55s both; }
+
+/* Scroll reveal */
+.reveal { opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease; }
+.reveal.visible { opacity:1; transform:none; }
+
+/* ─── RESPONSIVE TWEAKS ────────────────────────────────────── */
+@media (max-width:960px) {
+  .hero-body { grid-template-columns:1fr; padding-top:120px; }
+  .hero-mockup { display:none; }
+  .hiw-steps { grid-template-columns:1fr 1fr; }
+  .features-grid { grid-template-columns:1fr 1fr; }
+  .workflow-layout { grid-template-columns:1fr; }
+  .testimonials-grid { grid-template-columns:1fr; }
+  .login-inner { grid-template-columns:1fr; }
+  .footer-grid { grid-template-columns:1fr 1fr; gap:32px; }
+  .comp-table-wrap { overflow-x:auto; }
+}
+@media (max-width:640px) {
+  .nav { padding:0 24px; }
+  .section, .section-sm { padding:64px 24px; }
+  .hero-body { padding:110px 24px 64px; }
+  .features-grid { grid-template-columns:1fr; }
+  .hiw-steps { grid-template-columns:1fr; }
+  .hero-stats { grid-template-columns:repeat(2,1fr); }
+  .footer-grid { grid-template-columns:1fr; }
+  .footer { padding:40px 24px 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════
+     NAV
+════════════════════════════════════════════════════════ -->
+<nav class="nav" id="main-nav">
+  <a href="#" class="nav-brand">
+    <svg width="30" height="30" viewBox="0 0 34 34" fill="none">
+      <rect x=".5" y=".5" width="33" height="33" rx="5.5" fill="none" stroke="rgba(201,168,76,0.35)"/>
+      <line x1="8" y1="8"  x2="8"  y2="26" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+      <line x1="8" y1="8"  x2="19" y2="8"  stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+      <line x1="8" y1="17" x2="16" y2="17" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+      <line x1="8" y1="26" x2="19" y2="26" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+      <path d="M22 11 L29 17 L22 23" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"/>
+      <line x1="23" y1="17" x2="29" y2="17" stroke="rgba(255,255,255,0.38)" stroke-width="1.8" stroke-linecap="square"/>
+    </svg>
+    <div><div class="nav-equity">Equity</div><div class="nav-wf">Work · Flow</div></div>
+  </a>
+  <div class="nav-links">
+    <a href="#how-it-works" class="nav-link">How it works</a>
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#compare" class="nav-link">Compare</a>
+    <a href="#beta" class="nav-link">Beta access</a>
+    <a href="#beta" class="nav-cta">Sign in →</a>
+  </div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════
+     HERO
+════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-body">
+    <!-- Left -->
+    <div>
+      <div class="hero-eyebrow">Investor onboarding, reimagined</div>
+      <h1 class="hero-headline">
+        From pipeline<br>
+        <em>to close</em> —<br>
+        simplified.
+      </h1>
+      <p class="hero-desc">
+        Equity Work Flow is the institutional-grade platform that lets GPs and issuers onboard investors, manage subscription documents, control data room access, and track committed capital — all in one seamless workflow.
+      </p>
+      <div class="hero-actions">
+        <a href="#beta" class="btn-primary">Request beta access <span>→</span></a>
+        <a href="#how-it-works" class="btn-ghost-light">See how it works <span>↓</span></a>
+      </div>
+      <div class="hero-trust">
+        <div class="trust-item"><div class="trust-dot"></div>Subscription documents</div>
+        <div class="trust-item"><div class="trust-dot"></div>Secure data rooms</div>
+        <div class="trust-item"><div class="trust-dot"></div>Investor dashboards</div>
+      </div>
+    </div>
+
+    <!-- Right — platform mockup -->
+    <div class="hero-mockup">
+      <div style="position:relative;">
+        <div class="mockup-frame">
+          <div class="mockup-bar">
+            <div class="mock-dot" style="background:#ff5f57;"></div>
+            <div class="mock-dot" style="background:#febc2e;"></div>
+            <div class="mock-dot" style="background:#28c840;"></div>
+            <div style="flex:1;margin-left:8px;height:18px;background:rgba(255,255,255,.05);border-radius:4px;"></div>
+          </div>
+          <div class="mockup-inner">
+            <div class="mockup-sidebar">
+              <div class="mock-icon active">▦</div>
+              <div class="mock-icon">⊹</div>
+              <div class="mock-icon">◎</div>
+              <div class="mock-icon">▣</div>
+              <div class="mock-icon">✦</div>
+            </div>
+            <div class="mockup-main">
+              <div class="mock-stat-row">
+                <div class="mock-stat">
+                  <div class="mock-stat-l">Investors</div>
+                  <div class="mock-stat-v">47</div>
+                  <div class="mock-stat-d">↑ 6 this month</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-l">Committed</div>
+                  <div class="mock-stat-v">$24.6M</div>
+                  <div class="mock-stat-d">Across 4 deals</div>
+                </div>
+                <div class="mock-stat">
+                  <div class="mock-stat-l">Pending</div>
+                  <div class="mock-stat-v">3</div>
+                  <div class="mock-stat-d" style="color:rgba(201,168,76,.9);">Action needed</div>
+                </div>
+              </div>
+              <div class="mock-table">
+                <div class="mock-th">
+                  <span>Investor</span><span>Deal</span><span>Status</span><span>Amount</span>
+                </div>
+                <div class="mock-tr">
+                  <div><div class="mock-tr-n">River Oak Partners</div><div class="mock-tr-s">Family office</div></div>
+                  <div style="font-size:9px;color:rgba(255,255,255,.45);">Helix Bio SPV I</div>
+                  <div><span class="mock-badge mock-b-green">Active</span></div>
+                  <div class="mock-amt">$500K</div>
+                </div>
+                <div class="mock-tr">
+                  <div><div class="mock-tr-n">Nordic Capital AS</div><div class="mock-tr-s">Institution</div></div>
+                  <div style="font-size:9px;color:rgba(255,255,255,.45);">Volta Energy SPV</div>
+                  <div><span class="mock-badge mock-b-gold">Signing</span></div>
+                  <div class="mock-amt">$500K</div>
+                </div>
+                <div class="mock-tr">
+                  <div><div class="mock-tr-n">Thornwood Capital</div><div class="mock-tr-s">Family office</div></div>
+                  <div style="font-size:9px;color:rgba(255,255,255,.45);">Apex Fund II</div>
+                  <div><span class="mock-badge mock-b-teal">Data room</span></div>
+                  <div class="mock-amt">—</div>
+                </div>
+                <div class="mock-tr">
+                  <div><div class="mock-tr-n">Sarah Chen</div><div class="mock-tr-s">Individual / HNW</div></div>
+                  <div style="font-size:9px;color:rgba(255,255,255,.45);">Helix Bio SPV I</div>
+                  <div><span class="mock-badge mock-b-navy">In review</span></div>
+                  <div class="mock-amt">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating notification -->
+        <div class="mock-notif">
+          <div class="mock-notif-label">✓ Position created</div>
+          <div class="mock-notif-text">River Oak Partners</div>
+          <div class="mock-notif-sub">Helix Bio SPV I · 50 units @ $10,000</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hs-val">$4.2B<span>+</span></div>
+      <div class="hs-label">Capital processed</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-val">12K<span>+</span></div>
+      <div class="hs-label">Investors onboarded</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-val">98<span>%</span></div>
+      <div class="hs-label">Completion rate</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-val">3<span>×</span></div>
+      <div class="hs-label">Faster than legacy platforms</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════
+     HOW IT WORKS
+════════════════════════════════════════════════════════ -->
+<div class="hiw-bg" id="how-it-works">
+  <div class="section">
+    <div class="reveal">
+      <div class="section-eyebrow">The workflow</div>
+      <h2 class="section-heading">From GP pipeline to <em>committed investor</em></h2>
+      <p class="section-sub">Every step of the private equity onboarding journey — from first contact to executed subscription agreement and confirmed position — in a single platform.</p>
+    </div>
+    <div class="hiw-steps reveal">
+      <div class="hiw-step">
+        <div class="hiw-num">1</div>
+        <div class="hiw-title">Build your pipeline</div>
+        <div class="hiw-desc">Import your investor CRM via CSV or add contacts manually. Track every prospect through a visual Kanban — Prospect, Interested, Data Room, Subscription, Committed.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">2</div>
+        <div class="hiw-title">Grant data room access</div>
+        <div class="hiw-desc">Upload deal materials to a bank-grade encrypted data room. Control access at the document level — view only, view &amp; download, or GP-internal. NDA gating built in.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">3</div>
+        <div class="hiw-title">Send subscription docs</div>
+        <div class="hiw-desc">Generate and deliver subscription agreements via DocuSign. Gated by data room completion. Track signature status in real time. Automated reminders built in.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">4</div>
+        <div class="hiw-title">Accept &amp; create positions</div>
+        <div class="hiw-desc">Once both parties have signed, accept the executed agreement within the platform to formally create the investor's position — units, unit price, effective date, and all terms confirmed.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     FEATURES
+════════════════════════════════════════════════════════ -->
+<div class="features-bg" id="features">
+  <div class="section">
+    <div class="reveal" style="max-width:600px;">
+      <div class="section-eyebrow" style="color:var(--gold);">Platform capabilities</div>
+      <h2 class="section-heading" style="color:#fff;">Everything a GP needs.<br><em>Nothing they don't.</em></h2>
+    </div>
+    <div class="features-grid reveal">
+      <div class="feature-card">
+        <div class="feat-num">01</div>
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/><polyline points="14 2 14 8 20 8" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="13" x2="8" y2="13" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/><polyline points="10 9 9 9 8 9" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feat-title">Subscription documents</div>
+        <div class="feat-desc">Build and deliver subscription agreements through a 5-step workflow. Pre-fill investor details, attach your template, and send via DocuSign — all with status tracking and automated reminders.</div>
+        <a href="#beta" class="feat-link">Learn more →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feat-num">02</div>
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#c9a84c" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feat-title">Secure data rooms</div>
+        <div class="feat-desc">Bank-grade encrypted deal rooms with folder-level permissions. Control exactly who sees what — view, download, or GP-only. Full audit trail of every view, download, and access event.</div>
+        <a href="#beta" class="feat-link">Learn more →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feat-num">03</div>
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1" stroke="#c9a84c" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="#c9a84c" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke="#c9a84c" stroke-width="1.5"/><path d="M3 17.5h4m0 0v-4m0 4v4M7 17.5h4" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feat-title">Investor CRM pipeline</div>
+        <div class="feat-desc">A purpose-built Kanban CRM for private capital. Track every LP from prospect to committed, log calls and notes, link investors to deals, and import your existing contacts from CSV in minutes.</div>
+        <a href="#beta" class="feat-link">Learn more →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feat-num">04</div>
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="feat-title">Portfolio dashboards</div>
+        <div class="feat-desc">Live dashboards for both GPs and investors. GPs see deal funding progress, investor activity, and pending actions. Investors see their positions, documents, and subscription status — in real time.</div>
+        <a href="#beta" class="feat-link">Learn more →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feat-num">05</div>
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="#c9a84c" stroke-width="1.5"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feat-title">Investor-facing portal</div>
+        <div class="feat-desc">A branded investor portal where LPs can review deal materials, sign subscription agreements electronically, monitor their positions, and download all their documents — without emailing back and forth.</div>
+        <a href="#beta" class="feat-link">Learn more →</a>
+      </div>
+      <div class="feature-card">
+        <div class="feat-num">06</div>
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><polyline points="9 11 12 14 22 4" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="#c9a84c" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="feat-title">Access control &amp; gating</div>
+        <div class="feat-desc">Granular two-tier gating — GP approves data room access first, then unlocks subscription documents. Every access decision is logged. Pending requests surface as actionable items on the GP dashboard.</div>
+        <a href="#beta" class="feat-link">Learn more →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     WORKFLOW DEEP DIVE
+════════════════════════════════════════════════════════ -->
+<div style="background:var(--parch);">
+  <div class="section">
+    <div class="reveal" style="margin-bottom:48px;">
+      <div class="section-eyebrow">Built for GPs</div>
+      <h2 class="section-heading">A single platform for the full<br><em>investor lifecycle</em></h2>
+    </div>
+    <div class="workflow-layout reveal">
+      <div class="workflow-steps" id="wf-steps">
+        <div class="wf-step active" onclick="setWfStep(0)">
+          <div class="wf-dot">1</div>
+          <div><div class="wf-content-title">Build your investor CRM</div><div class="wf-content-desc">Import existing contacts, add prospects manually, and organise your entire LP network in a visual pipeline — from cold outreach to committed capital.</div></div>
+        </div>
+        <div class="wf-step" onclick="setWfStep(1)">
+          <div class="wf-dot">2</div>
+          <div><div class="wf-content-title">Share deal materials securely</div><div class="wf-content-desc">Upload PPMs, financial models, and due diligence materials to encrypted data rooms. Grant and revoke access per investor, per document, per deal.</div></div>
+        </div>
+        <div class="wf-step" onclick="setWfStep(2)">
+          <div class="wf-dot">3</div>
+          <div><div class="wf-content-title">Execute subscription agreements</div><div class="wf-content-desc">Generate subscription documents pre-filled with investor details, send via DocuSign, and track signature completion in real time. Gated by data room review.</div></div>
+        </div>
+        <div class="wf-step" onclick="setWfStep(3)">
+          <div class="wf-dot">4</div>
+          <div><div class="wf-content-title">Confirm investor positions</div><div class="wf-content-desc">Once both parties have signed, accept the executed agreement to create the investor's formal position — units, price, effective date, and all terms on record.</div></div>
+        </div>
+        <div class="wf-step" onclick="setWfStep(4)">
+          <div class="wf-dot">5</div>
+          <div><div class="wf-content-title">Live investor portal</div><div class="wf-content-desc">Investors log in to their own branded portal to view their position, download documents, and track deal progress — reducing GP admin and improving LP experience.</div></div>
+        </div>
+      </div>
+
+      <div class="wf-panel" id="wf-panel">
+        <div class="wf-panel-hd">
+          <div class="wf-panel-title" id="wf-panel-title">CRM Pipeline</div>
+          <div id="wf-panel-badge"></div>
+        </div>
+        <div class="wf-panel-body" id="wf-panel-body"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     COMPETITOR COMPARISON
+════════════════════════════════════════════════════════ -->
+<div class="comp-bg" id="compare">
+  <div class="section">
+    <div class="reveal">
+      <div class="section-eyebrow">Competitive landscape</div>
+      <h2 class="section-heading">Built for emerging GPs.<br><em>Priced to match.</em></h2>
+      <p class="section-sub">Juniper Square and InvestNext serve institutional managers with enterprise pricing. Equity Work Flow is purpose-built for the emerging GP — flat-rate SaaS, no AUM-based fees, no per-deal charges.</p>
+    </div>
+    <div class="comp-table-wrap reveal">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th style="min-width:220px;">Feature</th>
+            <th class="hero-col" style="min-width:180px;">Equity Work Flow</th>
+            <th style="min-width:150px;">Juniper Square</th>
+            <th style="min-width:150px;">InvestNext</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Subscription document builder</td><td class="hero-col"><span class="ck">✓</span> Included</td><td><span class="ck">✓</span> Included</td><td><span class="ck">✓</span> Included</td></tr>
+          <tr><td>Secure data room</td><td class="hero-col"><span class="ck">✓</span> Included</td><td><span class="ck">✓</span> Included</td><td><span class="cp">~</span> Add-on</td></tr>
+          <tr><td>GP investor CRM pipeline</td><td class="hero-col"><span class="ck">✓</span> Built-in</td><td><span class="cp">~</span> Limited</td><td><span class="cp">~</span> Basic</td></tr>
+          <tr><td>Access control gating (DR → Sub)</td><td class="hero-col"><span class="ck">✓</span> Granular</td><td><span class="cp">~</span> Partial</td><td><span class="cx">—</span> Not available</td></tr>
+          <tr><td>Investor-facing portal</td><td class="hero-col"><span class="ck">✓</span> Real-time</td><td><span class="ck">✓</span> Included</td><td><span class="cp">~</span> Basic</td></tr>
+          <tr><td>Position creation workflow</td><td class="hero-col"><span class="ck">✓</span> Included</td><td><span class="cp">~</span> Manual</td><td><span class="cp">~</span> Manual</td></tr>
+          <tr><td>CSV import / bulk onboarding</td><td class="hero-col"><span class="ck">✓</span> With mapping</td><td><span class="cx">—</span> Manual</td><td><span class="ck">✓</span> Included</td></tr>
+          <tr><td>Domain &amp; SEO advantage</td><td class="hero-col"><span class="ck">✓</span> equityworkflow.com</td><td><span class="cx">—</span></td><td><span class="cx">—</span></td></tr>
+          <tr><td>Pricing model</td><td class="hero-col" style="color:var(--green);font-weight:700;">Flat SaaS</td><td>AUM-based</td><td>Per-deal</td></tr>
+          <tr><td>Best for</td><td class="hero-col">Emerging GPs &amp; issuers</td><td>Institutional GPs</td><td>Real estate syndicators</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     TESTIMONIALS
+════════════════════════════════════════════════════════ -->
+<div style="background:var(--cream);">
+  <div class="section">
+    <div class="reveal" style="text-align:center;max-width:520px;margin:0 auto 0;">
+      <div class="section-eyebrow" style="justify-content:center;">What GPs are saying</div>
+      <h2 class="section-heading">Early access feedback</h2>
+    </div>
+    <div class="testimonials-grid reveal">
+      <div class="tcard">
+        <div class="tcard-text">We were managing subscription agreements in PDF email chains. Equity Work Flow replaced that entire process. The data room gating alone is worth the switch — our LPs appreciate the professional experience.</div>
+        <div class="tcard-author">
+          <div class="tcard-avi" style="background:#0F6E56;">MR</div>
+          <div><div class="tcard-name">Michael R.</div><div class="tcard-role">Managing Partner · Biotech SPV, Boston</div></div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="tcard-text">The investor portal is the feature our LPs love most. They can log in, see their position, download their signed agreement, and check deal progress without ever emailing us. It's reduced our admin by about 40%.</div>
+        <div class="tcard-author">
+          <div class="tcard-avi" style="background:#185FA5;">JC</div>
+          <div><div class="tcard-name">Jennifer C.</div><div class="tcard-role">Founder · Real Estate Syndication, NYC</div></div>
+        </div>
+      </div>
+      <div class="tcard">
+        <div class="tcard-text">We evaluated Juniper Square but the pricing was built for a $500M fund. Equity Work Flow gave us everything we needed as a $15M emerging GP at a fraction of the cost. The CRM pipeline alone is a game-changer.</div>
+        <div class="tcard-author">
+          <div class="tcard-avi" style="background:#854F0B;">DW</div>
+          <div><div class="tcard-name">David W.</div><div class="tcard-role">General Partner · Growth Equity Fund</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     LOGIN / BETA ACCESS
+════════════════════════════════════════════════════════ -->
+<div class="login-section" id="beta">
+  <div class="section">
+    <div class="login-inner">
+      <!-- Left: copy -->
+      <div class="reveal">
+        <div class="section-eyebrow" style="color:var(--gold);">Beta access</div>
+        <h2 class="login-headline">Ready to transform your<br><em>investor workflow?</em></h2>
+        <p class="login-desc">Join our beta program and get early access to the full Equity Work Flow platform. We're onboarding emerging GPs, real estate syndicators, and private equity issuers now.</p>
+        <div class="login-bullets">
+          <div class="login-bullet">Full platform access during beta — no feature gates</div>
+          <div class="login-bullet">White-glove onboarding and GP support</div>
+          <div class="login-bullet">Founding member pricing when we launch</div>
+          <div class="login-bullet">Direct influence on the product roadmap</div>
+          <div class="login-bullet">Dedicated Slack channel with the founding team</div>
+        </div>
+      </div>
+
+      <!-- Right: login/signup card -->
+      <div class="reveal">
+        <div class="login-card">
+          <div class="lc-header">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+              <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
+                <rect x=".5" y=".5" width="33" height="33" rx="5.5" fill="none" stroke="rgba(201,168,76,0.35)"/>
+                <line x1="8" y1="8" x2="8" y2="26" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+                <line x1="8" y1="8" x2="19" y2="8" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+                <line x1="8" y1="17" x2="16" y2="17" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+                <line x1="8" y1="26" x2="19" y2="26" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+                <path d="M22 11 L29 17 L22 23" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"/>
+                <line x1="23" y1="17" x2="29" y2="17" stroke="rgba(255,255,255,0.38)" stroke-width="1.8" stroke-linecap="square"/>
+              </svg>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:15px;color:#fff;">Equity Work Flow</div>
+                <div style="font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);">Investor Platform</div>
+              </div>
+            </div>
+            <div class="lc-beta-badge">● Beta</div>
+            <div class="lc-title">Access your account</div>
+            <div class="lc-sub">Sign in or request beta access below</div>
+          </div>
+          <div class="lc-body">
+            <div class="lc-tabs">
+              <button class="lc-tab active" id="tab-signin" onclick="switchTab('signin')">Sign in</button>
+              <button class="lc-tab" id="tab-request" onclick="switchTab('request')">Request access</button>
+            </div>
+
+            <!-- Sign in form -->
+            <div id="form-signin">
+              <div class="lf-group">
+                <label class="lf-label">Email address</label>
+                <input class="lf-input" type="email" placeholder="you@yourfund.com" id="si-email">
+              </div>
+              <div class="lf-group">
+                <label class="lf-label">Password</label>
+                <input class="lf-input" type="password" placeholder="••••••••••" id="si-password">
+              </div>
+              <button class="lf-btn" onclick="handleSignIn.call(this, event)">Sign in to platform →</button>
+              <div class="lf-divider"><span>or</span></div>
+              <button class="lf-btn" style="background:var(--parch2);color:var(--ink);border:1px solid var(--border2);" onclick="handleSignIn.call(this, event)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                Continue with Google
+              </button>
+              <div class="lf-hint"><a href="#" style="color:var(--navy);text-decoration:none;">Forgot your password?</a> · <a href="#" onclick="switchTab('request');return false;" style="color:var(--navy);text-decoration:none;">Request access</a></div>
+            </div>
+
+            <!-- Request access form -->
+            <div id="form-request" style="display:none;">
+              <div class="lf-grid2">
+                <div class="lf-group" style="margin-bottom:0;"><label class="lf-label">First name</label><input class="lf-input" type="text" placeholder="James" id="ra-first"></div>
+                <div class="lf-group" style="margin-bottom:0;"><label class="lf-label">Last name</label><input class="lf-input" type="text" placeholder="Walsh" id="ra-last"></div>
+              </div>
+              <div class="lf-group" style="margin-top:12px;">
+                <label class="lf-label">Work email</label>
+                <input class="lf-input" type="email" placeholder="james@yourfund.com" id="ra-email">
+              </div>
+              <div class="lf-group">
+                <label class="lf-label">Fund / firm name</label>
+                <input class="lf-input" type="text" placeholder="Apex Capital Partners" id="ra-firm">
+              </div>
+              <div class="lf-group">
+                <label class="lf-label">Role</label>
+                <select class="lf-select" id="ra-role">
+                  <option value="">Select your role…</option>
+                  <option>General Partner</option>
+                  <option>Managing Partner</option>
+                  <option>Founding Partner</option>
+                  <option>Chief of Staff / COO</option>
+                  <option>Investor Relations</option>
+                  <option>Fund Administrator</option>
+                  <option>Real Estate Syndicator</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="lf-group">
+                <label class="lf-label">Typical deal size</label>
+                <select class="lf-select" id="ra-size">
+                  <option value="">Select…</option>
+                  <option>Under $1M</option>
+                  <option>$1M – $5M</option>
+                  <option>$5M – $25M</option>
+                  <option>$25M – $100M</option>
+                  <option>$100M+</option>
+                </select>
+              </div>
+              <button class="lf-btn gold" onclick="handleRequestAccess.call(this, event)">Request beta access →</button>
+              <div class="lf-hint">We review all requests within 1 business day. No credit card required.</div>
+            </div>
+
+            <!-- Success state -->
+            <div class="lf-success" id="form-success">
+              <div class="lf-success-icon">✓</div>
+              <div class="lf-success-title">You're on the list</div>
+              <div class="lf-success-text">We've received your request and will be in touch within 1 business day with your access credentials and onboarding details.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <svg width="28" height="28" viewBox="0 0 34 34" fill="none">
+            <rect x=".5" y=".5" width="33" height="33" rx="5.5" fill="none" stroke="rgba(201,168,76,0.25)"/>
+            <line x1="8" y1="8" x2="8" y2="26" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+            <line x1="8" y1="8" x2="19" y2="8" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+            <line x1="8" y1="17" x2="16" y2="17" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+            <line x1="8" y1="26" x2="19" y2="26" stroke="#c9a84c" stroke-width="2.2" stroke-linecap="square"/>
+            <path d="M22 11 L29 17 L22 23" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"/>
+            <line x1="23" y1="17" x2="29" y2="17" stroke="rgba(255,255,255,0.25)" stroke-width="1.8" stroke-linecap="square"/>
+          </svg>
+          <div>
+            <div class="footer-brand-equity">Equity</div>
+            <div class="footer-brand-wf">Work · Flow</div>
+          </div>
+        </div>
+        <div class="footer-tagline">From pipeline to close — the investor onboarding platform built for emerging GPs and private capital issuers.</div>
+        <div class="footer-domain">equityworkflow.com</div>
+      </div>
+      <div>
+        <div class="footer-col-title">Platform</div>
+        <a href="#features" class="footer-link">Features</a>
+        <a href="#how-it-works" class="footer-link">How it works</a>
+        <a href="#compare" class="footer-link">Compare</a>
+        <a href="#beta" class="footer-link">Beta access</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <a href="#" class="footer-link">GP Platform</a>
+        <a href="#" class="footer-link">Investor Portal</a>
+        <a href="#" class="footer-link">Data Rooms</a>
+        <a href="#" class="footer-link">Subscriptions</a>
+        <a href="#" class="footer-link">CRM Pipeline</a>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <a href="#" class="footer-link">About</a>
+        <a href="#" class="footer-link">Security</a>
+        <a href="#" class="footer-link">Contact</a>
+        <a href="#" class="footer-link">Privacy policy</a>
+        <a href="#" class="footer-link">Terms of service</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Equity Work Flow. All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Security</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ─── WORKER ENDPOINT — update after deploying ──────────── */
+const WORKER_URL = 'https://a2.equityworkflow.com/api/submit';
+
+/* ─── NAV SCROLL ──────────────────────────────────────────── */
+window.addEventListener('scroll', () => {
+  const nav = document.getElementById('main-nav');
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+document.getElementById('main-nav').classList.add('scrolled'); // start solid
+
+/* ─── SCROLL REVEAL ───────────────────────────────────────── */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }});
+}, { threshold:0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ─── WORKFLOW PANEL ──────────────────────────────────────── */
+const WF_PANELS = [
+  {
+    title:'Investor CRM Pipeline',
+    badge:'<span style="font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(201,168,76,.2);color:#c9a84c;font-weight:600;">47 contacts</span>',
+    body:`<div style="display:flex;flex-direction:column;gap:6px;">
+      ${['Prospect','Interested','Data room','Subscription','Committed'].map((s,i)=>{
+        const colors=['#9e9a91','#162d55','#0c5c52','#8a6710','#1a5c2e'];
+        const counts=[8,12,15,7,5];
+        const w=[20,30,38,18,14];
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(26,25,22,.07);">
+          <div style="width:90px;font-size:11.5px;color:#6e6b62;">${s}</div>
+          <div style="flex:1;height:6px;background:#edeae3;border-radius:3px;"><div style="height:100%;width:${w[i]}%;background:${colors[i]};border-radius:3px;"></div></div>
+          <div style="width:20px;font-size:11.5px;font-weight:600;color:#3d3b35;text-align:right;">${counts[i]}</div>
+        </div>`;
+      }).join('')}
+      <div style="margin-top:10px;padding:12px;background:#f5f3ef;border-radius:8px;font-size:12px;color:#6e6b62;">
+        <strong style="color:#1a1916;">Latest:</strong> Patel Ventures requested data room access · Helix Bio SPV I · Yesterday 4:30 pm
+      </div>
+    </div>`
+  },
+  {
+    title:'Data Room — Helix Bio SPV I',
+    badge:'<span style="font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(12,92,82,.2);color:#0c5c52;font-weight:600;">6 documents</span>',
+    body:`<div>
+      ${[['📁','Company overview','3 files'],['📁','Financials','2 files'],['📁','Legal','1 file']].map(([ic,name,count])=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid rgba(26,25,22,.07);">
+          <span style="font-size:16px;">${ic}</span>
+          <div style="flex:1;font-size:13px;font-weight:600;color:#1a1916;">${name}</div>
+          <span style="font-size:11.5px;color:#9e9a91;">${count}</span>
+          <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:#e5f4f1;color:#0c5c52;font-weight:600;">Active</span>
+        </div>`).join('')}
+      <div style="margin-top:12px;padding:10px 12px;background:#edf1f9;border-radius:8px;font-size:12px;color:#162d55;">
+        <strong>4 investors</strong> have active data room access · 3 have viewed financials this week
+      </div>
+    </div>`
+  },
+  {
+    title:'Subscription Builder',
+    badge:'<span style="font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(138,103,16,.15);color:#8a6710;font-weight:600;">Step 3 of 5</span>',
+    body:`<div>
+      <div style="display:flex;background:#faf9f7;border:1px solid rgba(26,25,22,.09);border-radius:8px;overflow:hidden;margin-bottom:16px;">
+        ${['Select investor','Confirm access','Terms','Attach doc','Send'].map((l,i)=>`
+          <div style="flex:1;padding:10px 6px;text-align:center;border-right:1px solid rgba(26,25,22,.09);${i===4?'border-right:none;':''}background:${i<2?'#edeae3':i===2?'#faf3df':'#faf9f7'};">
+            <div style="width:20px;height:20px;border-radius:50%;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;background:${i<2?'#0d1e3d':i===2?'#8a6710':'#edeae3'};color:${i<2?'#fff':i===2?'#fff':'#9e9a91'};">${i<2?'✓':i+1}</div>
+            <div style="font-size:9px;font-weight:500;color:${i===2?'#1a1916':'#9e9a91'};">${l}</div>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#1a1916;margin-bottom:10px;">Nordic Capital AS · Volta Energy SPV</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${[['Commitment','$500,000'],['Entity type','LLC / Corporation'],['Management fee','2%'],['Carried interest','20%']].map(([l,v])=>`
+          <div style="background:#f5f3ef;border-radius:6px;padding:8px 10px;">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:#9e9a91;font-weight:600;margin-bottom:2px;">${l}</div>
+            <div style="font-size:12.5px;font-weight:600;">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>`
+  },
+  {
+    title:'Accept & Create Position',
+    badge:'<span style="font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(26,92,46,.15);color:#1a5c2e;font-weight:600;">Both parties signed</span>',
+    body:`<div>
+      <div style="background:#eaf4ed;border:1px solid #c4e8ce;border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-size:18px;">✅</span>
+        <div><div style="font-size:12.5px;font-weight:600;color:#1a5c2e;">Agreement fully executed</div><div style="font-size:11.5px;color:#6e6b62;">River Oak Partners · Meridian RE SPV · Signed Mar 18</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+        ${[['Amount','$1,000,000'],['Unit price','$10,000'],['Units','100'],['Effective','Mar 18']].map(([l,v])=>`
+          <div style="background:#f5f3ef;border-radius:6px;padding:10px 12px;">
+            <div style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:#9e9a91;font-weight:600;margin-bottom:2px;">${l}</div>
+            <div style="font-size:14px;font-weight:700;color:#0d1e3d;">${v}</div>
+          </div>`).join('')}
+      </div>
+      <div style="background:#0d1e3d;border-radius:6px;padding:10px 14px;font-size:11.5px;color:rgba(255,255,255,.6);">✓ Position will be created immediately upon acceptance</div>
+    </div>`
+  },
+  {
+    title:'Investor Portal — River Oak Partners',
+    badge:'<span style="font-size:10px;padding:3px 10px;border-radius:10px;background:rgba(12,92,82,.2);color:#0c5c52;font-weight:600;">Active</span>',
+    body:`<div>
+      <div style="background:#0d1e3d;border-radius:8px;padding:16px;margin-bottom:14px;">
+        <div style="font-size:10px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px;">Helix Bio SPV I · Active position</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+          ${[['Commitment','$500,000'],['Units','50'],['Unit price','$10,000']].map(([l,v])=>`
+            <div><div style="font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.3);margin-bottom:3px;">${l}</div>
+            <div style="font-family:'DM Mono',monospace;font-size:14px;color:#c9a84c;">${v}</div></div>`).join('')}
+        </div>
+      </div>
+      <div style="font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#9e9a91;margin-bottom:8px;">Available documents</div>
+      ${[['📋','Subscription Agreement','Signed ✓'],['📄','Position Confirmation','Active'],['📊','Q1 2026 Financial Model','Data room']].map(([ic,n,s])=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(26,25,22,.07);">
+          <span>${ic}</span>
+          <div style="flex:1;font-size:12px;font-weight:500;">${n}</div>
+          <span style="font-size:10px;color:#1a5c2e;font-weight:600;">${s}</span>
+        </div>`).join('')}
+    </div>`
+  },
+];
+
+let activeWfStep = 0;
+function setWfStep(i){
+  activeWfStep = i;
+  document.querySelectorAll('.wf-step').forEach((s,j) => {
+    s.classList.toggle('active', j===i);
+  });
+  document.getElementById('wf-panel-title').textContent = WF_PANELS[i].title;
+  document.getElementById('wf-panel-badge').innerHTML = WF_PANELS[i].badge;
+  document.getElementById('wf-panel-body').innerHTML = WF_PANELS[i].body;
+}
+setWfStep(0);
+
+// Auto-advance workflow panel
+let wfTimer = setInterval(() => {
+  setWfStep((activeWfStep+1) % WF_PANELS.length);
+}, 4000);
+document.querySelectorAll('.wf-step').forEach(s => {
+  s.addEventListener('click', () => { clearInterval(wfTimer); });
+});
+
+/* ─── TABS (see switchTab in helpers below) ────────────────────── */
+
+/* ─── SIGN IN ─────────────────────────────────────────────── */
+async function handleSignIn(){
+  const email = document.getElementById('si-email').value.trim();
+  const pass  = document.getElementById('si-password').value;
+  if(!email){ showFieldError('si-email','Please enter your email address.'); return; }
+  if(!pass){  showFieldError('si-password','Please enter your password.'); return; }
+
+  const btn = document.querySelector('#form-signin .lf-btn');
+  setLoading(btn, true, 'Signing in…');
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ formType: 'signin', email }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('form-signin').innerHTML = `
+        <div style="text-align:center;padding:16px 0;">
+          <div style="width:52px;height:52px;border-radius:50%;background:var(--green-pale);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:22px;">→</div>
+          <div style="font-family:'Playfair Display',serif;font-size:18px;font-weight:500;margin-bottom:6px;color:var(--ink);">Redirecting to platform…</div>
+          <div style="font-size:13px;color:var(--ink3);">Taking you to your Equity Work Flow dashboard.</div>
+        </div>`;
+      setTimeout(() => { window.location.href = data.redirect || 'https://app.equityworkflow.com'; }, 1200);
+    } else {
+      showFormError('form-signin', data.error || 'Sign-in failed. Please try again.');
+      setLoading(btn, false, 'Sign in to platform →');
+    }
+  } catch(err) {
+    showFormError('form-signin', 'Connection error. Please try again.');
+    setLoading(btn, false, 'Sign in to platform →');
+  }
+}
+
+/* ─── REQUEST ACCESS ──────────────────────────────────────── */
+async function handleRequestAccess(){
+  const first    = document.getElementById('ra-first').value.trim();
+  const last     = document.getElementById('ra-last').value.trim();
+  const email    = document.getElementById('ra-email').value.trim();
+  const firm     = document.getElementById('ra-firm').value.trim();
+  const role     = document.getElementById('ra-role').value;
+  const dealSize = document.getElementById('ra-size').value;
+
+  let valid = true;
+  if(!first)                  { showFieldError('ra-first','Required'); valid=false; }
+  if(!email||!email.includes('@')){ showFieldError('ra-email','Valid email required'); valid=false; }
+  if(!firm)                   { showFieldError('ra-firm','Required'); valid=false; }
+  if(!role)                   { showFieldError('ra-role','Please select your role'); valid=false; }
+  if(!valid) return;
+
+  const btn = document.querySelector('#form-request .lf-btn.gold');
+  setLoading(btn, true, 'Submitting…');
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ formType:'request', firstName:first, lastName:last, email, firm, role, dealSize }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('form-request').style.display = 'none';
+      document.getElementById('form-success').classList.add('show');
+    } else {
+      showFormError('form-request', data.error || 'Submission failed. Please try again.');
+      setLoading(btn, false, 'Request beta access →');
+    }
+  } catch(err) {
+    showFormError('form-request', 'Connection error. Please try again.');
+    setLoading(btn, false, 'Request beta access →');
+  }
+}
+
+/* ─── SMOOTH SCROLL FOR NAV LINKS ────────────────────────── */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if(target){ e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+
+/* ─── FORM HELPERS ──────────────────────────────────────────── */
+
+// Show inline field error
+function showFieldError(fieldId, msg) {
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  el.style.borderColor = '#c9353b';
+  el.style.boxShadow   = '0 0 0 3px rgba(201,53,59,.1)';
+  // Remove old error hint
+  const old = el.parentNode.querySelector('.field-error');
+  if (old) old.remove();
+  const hint = document.createElement('div');
+  hint.className   = 'field-error';
+  hint.textContent = msg;
+  hint.style.cssText = 'font-size:11px;color:#c9353b;margin-top:4px;';
+  el.parentNode.appendChild(hint);
+  el.addEventListener('input', () => {
+    el.style.borderColor = ''; el.style.boxShadow = '';
+    hint.remove();
+  }, { once: true });
+}
+
+// Show form-level error banner
+function showFormError(formId, msg) {
+  const form = document.getElementById(formId);
+  const old  = form.querySelector('.form-error-banner');
+  if (old) old.remove();
+  const banner = document.createElement('div');
+  banner.className = 'form-error-banner';
+  banner.textContent = msg;
+  banner.style.cssText = 'background:#fdf0f0;border:1px solid #f5cece;color:#7a1f1f;font-size:12.5px;padding:10px 14px;border-radius:6px;margin-bottom:12px;';
+  form.insertBefore(banner, form.firstChild);
+}
+
+// Button loading state
+function setLoading(btn, loading, label) {
+  if (!btn) return;
+  btn.disabled      = loading;
+  btn.textContent   = label;
+  btn.style.opacity = loading ? '0.7' : '1';
+}
+
+// Clear field errors on form tab switch
+function switchTab(tab){
+  document.getElementById('tab-signin').classList.toggle('active', tab==='signin');
+  document.getElementById('tab-request').classList.toggle('active', tab==='request');
+  document.getElementById('form-signin').style.display  = tab==='signin'  ? '' : 'none';
+  document.getElementById('form-request').style.display = tab==='request' ? '' : 'none';
+  document.getElementById('form-success').classList.remove('show');
+  // Clear any error banners
+  document.querySelectorAll('.form-error-banner, .field-error').forEach(e => e.remove());
+  document.querySelectorAll('.lf-input, .lf-select').forEach(e => {
+    e.style.borderColor = ''; e.style.boxShadow = '';
+  });
+}
+
+</script>
+</body>
+</html>
