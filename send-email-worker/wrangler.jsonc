@@ -24,13 +24,21 @@
 	"vars": {
 		"FROM_EMAIL": "info@equityworkflow.com",
 		"RESEND_API_KEY": "re_XazmTrkU_2q4vrFxQoTAr49iLJfx1grnx",
-		"TO_EMAIL": "cmills@equityworkflow.com; dmcphedran@equityworkflow.com"
+		"TO_EMAILX": "cmills@equityworkflow.com; dmcphedran@equityworkflow.com",
+		"TO_EMAIL": "cmills@equityworkflow.com"
 	},
 	"routes": [
-	    {
-	      "pattern": "a2.equityworkflow.com/api/submit",
-	      "zone_name": "equityworkflow.com"
-	    }
+		{
+			"pattern": "a2.equityworkflow.com/api/submit",
+			"zone_name": "equityworkflow.com"
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "equityworkflow-forms",
+			"database_id": "765b419e-9a8a-4ac7-b53e-8b800bf60b4a"
+		}
 	]
 
 	/**
