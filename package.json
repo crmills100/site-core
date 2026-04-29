@@ -3,17 +3,12 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev",
-		"test": "vitest",
-		"cf-typegen": "wrangler types"
+		"dev": "npx wrangler pages dev",
+		"deploy": "npx wrangler pages deploy",
+		"db:apply": "npx wrangler d1 execute equityworkflow-forms --file=packages/db-schema/equityworkflow-d1-schema.sql",
+		"db:query": "npx wrangler d1 execute equityworkflow-forms --command"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.7.5",
-		"@cloudflare/workers-types": "^4.20250403.0",
-		"typescript": "^5.5.2",
-		"vitest": "~3.0.7",
-		"wrangler": "^4.7.0"
+		"wrangler": "^4.83.0"
 	}
 }
