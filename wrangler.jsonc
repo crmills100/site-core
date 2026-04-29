@@ -11,6 +11,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "equityworkflow",
+	"pages_build_output_dir": "apps/www/public",
 	"compatibility_date": "2026-04-19",
 	"observability": {
 		"enabled": true

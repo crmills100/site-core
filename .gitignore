@@ -1,3 +1,7 @@
 
 # backup files
 *~
+
+.wrangler/*
+node_modules/*
+

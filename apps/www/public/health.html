@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Health Check</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 60px auto; padding: 0 20px; }
+    .status { font-size: 1.2em; margin: 8px 0; }
+    .ok   { color: green; }
+    .fail { color: red; }
+    button { margin-top: 20px; padding: 8px 16px; cursor: pointer; }
+    pre { background: #f4f4f4; padding: 12px; overflow-x: auto; font-size: 0.85em; }
+  </style>
+</head>
+<body>
+  <h1>Health Check</h1>
+  <div id="results"></div>
+  <button onclick="runChecks()">Run Checks</button>
+
+  <script>
+    async function checkApi() {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formType: '__healthcheck__' }),
+      });
+      const data = await res.json();
+      // Expect a 400 with { ok: false, error: "Unknown form type" }
+      if (res.status === 400 && data.error === 'Unknown form type') {
+        return { ok: true, detail: 'API reachable — returned expected 400 for unknown form type' };
+      }
+      return { ok: false, detail: `Unexpected response: ${res.status} ${JSON.stringify(data)}` };
+    }
+
+    async function runChecks() {
+      const el = document.getElementById('results');
+      el.innerHTML = '<p>Running...</p>';
+
+      const checks = [];
+
+      // Static assets
+      checks.push({ name: 'Static assets (this page)', ok: true, detail: 'Page loaded successfully' });
+
+      // API
+      try {
+        const api = await checkApi();
+        checks.push({ name: 'API /api/submit', ...api });
+      } catch (e) {
+        checks.push({ name: 'API /api/submit', ok: false, detail: e.message });
+      }
+
+      el.innerHTML = checks.map(c => `
+        <div class="status ${c.ok ? 'ok' : 'fail'}">
+          ${c.ok ? '✓' : '✗'} <strong>${c.name}</strong>
+        </div>
+        <pre>${c.detail}</pre>
+      `).join('');
+    }
+
+    runChecks();
+  </script>
+</body>
+</html>
